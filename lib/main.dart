@@ -9,6 +9,7 @@ import 'user_auth/login_page.dart';
 import 'user_auth/signup_page.dart';
 import 'settings_page.dart';
 import 'camera_page.dart';
+import 'profile_page.dart';
 
 // Global variable for cameras
 late List<CameraDescription> cameras;
@@ -53,6 +54,7 @@ class MyApp extends StatelessWidget {
         '/homepage': (context) => const HomePage(),
         '/settings': (context) => const SettingsPage(),
         '/camera': (context) => const CameraPage(),
+        '/profile': (context) => const ProfilePage(),
       },
     );
   }

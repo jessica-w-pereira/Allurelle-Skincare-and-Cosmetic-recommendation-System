@@ -1,9 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'camera_page.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
+
+  @override
+  _HomePageState createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  String userName = 'User'; // Default name
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserName();
+  }
+
+  Future<void> _fetchUserName() async {
+    final User? user = _auth.currentUser;
+    if (user != null) {
+      DocumentSnapshot doc = await _firestore.collection('users').doc(user.uid).get();
+      if (doc.exists && doc.data() != null) {
+        setState(() {
+          userName = doc['name']; // Assuming 'name' is the field storing the user's name
+        });
+      }
+    }
+  }
 
   void _openCamera(BuildContext context) async {
     final String? imagePath = await Navigator.push(
@@ -26,9 +54,6 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final User? user = FirebaseAuth.instance.currentUser;
-    String userName = user?.displayName ?? 'Guest';
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -58,7 +83,7 @@ class HomePage extends StatelessWidget {
                       ),
                     ),
                     TextSpan(
-                      text: userName,
+                      text: userName, // Displays user's name
                       style: const TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
@@ -163,6 +188,11 @@ class HomePage extends StatelessWidget {
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
+        onTap: (index) {
+          if (index == 3) {
+            Navigator.pushNamed(context, '/profile'); // Navigate to Profile
+          }
+        },
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
