@@ -1,14 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'camera_page.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({Key? key}) : super(key: key);
 
+  void _openCamera(BuildContext context) async {
+    final String? imagePath = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const CameraPage(),
+      ),
+    );
+
+    if (imagePath != null) {
+      debugPrint('Image captured at: $imagePath');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Image captured successfully!'),
+          backgroundColor: Colors.pinkAccent,
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    // Fetch the currently logged-in user
     final User? user = FirebaseAuth.instance.currentUser;
-    String userName = user?.displayName ?? 'Guest'; // Use displayName or 'Guest' if not available
+    String userName = user?.displayName ?? 'Guest';
 
     return Scaffold(
       appBar: AppBar(
@@ -16,7 +35,7 @@ class HomePage extends StatelessWidget {
         elevation: 0,
         actions: [
           IconButton(
-            icon: Icon(Icons.notifications_outlined, color: Colors.grey),
+            icon: const Icon(Icons.notifications_outlined, color: Colors.grey),
             onPressed: () {},
           ),
         ],
@@ -27,11 +46,10 @@ class HomePage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Welcome Message
               RichText(
                 text: TextSpan(
                   children: [
-                    TextSpan(
+                    const TextSpan(
                       text: "Welcome back,\n",
                       style: TextStyle(
                         fontSize: 22,
@@ -40,8 +58,8 @@ class HomePage extends StatelessWidget {
                       ),
                     ),
                     TextSpan(
-                      text: "$userName",
-                      style: TextStyle(
+                      text: userName,
+                      style: const TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
                         color: Colors.pinkAccent,
@@ -50,13 +68,12 @@ class HomePage extends StatelessWidget {
                   ],
                 ),
               ),
-              Text(
+              const Text(
                 "It's great to see you again!",
                 style: TextStyle(fontSize: 16, color: Colors.grey),
               ),
-              SizedBox(height: 30),
+              const SizedBox(height: 30),
 
-              // Buttons for SkinQuiz and Capture Face
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -65,40 +82,37 @@ class HomePage extends StatelessWidget {
                       onPressed: () {
                         // Navigate to SkinQuiz
                       },
-                      icon: Icon(Icons.chat_bubble_outline),
-                      label: Text("Take SkinQuiz"),
+                      icon: const Icon(Icons.chat_bubble_outline),
+                      label: const Text("Take SkinQuiz"),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.pinkAccent,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20.0),
                         ),
-                        padding: EdgeInsets.all(15),
+                        padding: const EdgeInsets.all(15),
                       ),
                     ),
                   ),
-                  SizedBox(width: 10),
+                  const SizedBox(width: 10),
                   Expanded(
                     child: ElevatedButton.icon(
-                      onPressed: () {
-                        // Navigate to Capture Face
-                      },
-                      icon: Icon(Icons.camera_alt_outlined),
-                      label: Text("Capture Face"),
+                      onPressed: () => _openCamera(context),
+                      icon: const Icon(Icons.camera_alt_outlined),
+                      label: const Text("Capture Face"),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.pinkAccent,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20.0),
                         ),
-                        padding: EdgeInsets.all(15),
+                        padding: const EdgeInsets.all(15),
                       ),
                     ),
                   ),
                 ],
               ),
-              SizedBox(height: 30),
+              const SizedBox(height: 30),
 
-              // Product Recommendations
-              Text(
+              const Text(
                 "Recommended for You",
                 style: TextStyle(
                   fontSize: 22,
@@ -106,8 +120,8 @@ class HomePage extends StatelessWidget {
                   color: Colors.pinkAccent,
                 ),
               ),
-              SizedBox(height: 10),
-              Container(
+              const SizedBox(height: 10),
+              SizedBox(
                 height: 140,
                 child: ListView(
                   scrollDirection: Axis.horizontal,
@@ -120,18 +134,17 @@ class HomePage extends StatelessWidget {
                   ],
                 ),
               ),
-              SizedBox(height: 30),
+              const SizedBox(height: 30),
 
-              // Dermatologist Consult Banner
               Container(
                 decoration: BoxDecoration(
                   color: Colors.pink[50],
                   borderRadius: BorderRadius.circular(15),
                 ),
-                padding: EdgeInsets.all(16),
+                padding: const EdgeInsets.all(16),
                 child: Row(
                   children: [
-                    Expanded(
+                    const Expanded(
                       child: Text(
                         "Get 10% off your first dermatologist consultation!",
                         style: TextStyle(
@@ -149,10 +162,8 @@ class HomePage extends StatelessWidget {
           ),
         ),
       ),
-
-      // Bottom Navigation Bar
       bottomNavigationBar: BottomNavigationBar(
-        items: [
+        items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
             label: 'Home',
@@ -177,14 +188,13 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  // Product Card Widget
   Widget productCard(String title, String imagePath) {
     return Container(
       width: 120,
-      margin: EdgeInsets.only(right: 12),
+      margin: const EdgeInsets.only(right: 12),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(15),
-        boxShadow: [
+        boxShadow: const [
           BoxShadow(
             color: Colors.black12,
             blurRadius: 5,
@@ -198,12 +208,27 @@ class HomePage extends StatelessWidget {
         children: [
           ClipRRect(
             borderRadius: BorderRadius.circular(15),
-            child: Image.asset(imagePath, height: 80, fit: BoxFit.cover),
+            child: Image.asset(
+              imagePath,
+              height: 80,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                return Container(
+                  height: 80,
+                  color: Colors.grey[200],
+                  child: const Icon(Icons.image_not_supported, color: Colors.grey),
+                );
+              },
+            ),
           ),
-          SizedBox(height: 8),
+          const SizedBox(height: 8),
           Text(
             title,
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.grey[700]),
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              color: Colors.grey[700],
+            ),
           ),
         ],
       ),

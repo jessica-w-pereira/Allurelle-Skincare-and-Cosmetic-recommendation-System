@@ -1,17 +1,36 @@
-import 'package:allurelle_test_2/home_page.dart' as home;
-import 'package:allurelle_test_2/settings_page.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:camera/camera.dart';
+import 'home_page.dart';
 import 'landing_page.dart';
 import 'user_auth/login_page.dart';
 import 'user_auth/signup_page.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'home_page.dart';
+import 'settings_page.dart';
+import 'camera_page.dart';
 
+// Global variable for cameras
+late List<CameraDescription> cameras;
 
 void main() async {
+  // Ensure Flutter bindings are initialized
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize Firebase
   await Firebase.initializeApp();
+
+  // Request camera permission
+  await Permission.camera.request();
+
+  // Initialize cameras
+  try {
+    cameras = await availableCameras();
+  } on CameraException catch (e) {
+    debugPrint('Error initializing cameras: $e');
+    cameras = [];
+  }
+
   runApp(const MyApp());
 }
 
@@ -21,23 +40,24 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter App',
+      title: 'Allurelle',
       theme: ThemeData(
         primarySwatch: Colors.pink,
+        scaffoldBackgroundColor: Colors.white,
       ),
-      home: const AuthCheck(), // Start the app with the AuthCheck widget
+      home: const AuthCheck(),
       routes: {
         '/home': (context) => const LandingPage(),
         '/login': (context) => const LoginPage(),
-        '/signup': (context) => const SignUpPage(), // Ensure SignUpPage exists in signup_page.dart
-        '/homepage': (context) => home.HomePage(), // Remove const for non-const constructor
+        '/signup': (context) => const SignUpPage(),
+        '/homepage': (context) => const HomePage(),
         '/settings': (context) => const SettingsPage(),
+        '/camera': (context) => const CameraPage(),
       },
     );
   }
 }
 
-// This widget checks if the user is logged in or not
 class AuthCheck extends StatelessWidget {
   const AuthCheck({super.key});
 
@@ -46,17 +66,19 @@ class AuthCheck extends StatelessWidget {
     return StreamBuilder<User?>(
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
-        // If the user is logged in, redirect to HomePage
         if (snapshot.connectionState == ConnectionState.active) {
           User? user = snapshot.data;
           if (user == null) {
-            return const LoginPage(); // If the user is not logged in, show login page
+            return const LoginPage();
           } else {
-            return home.HomePage(); // Remove const for non-const constructor
+            return const HomePage();
           }
         }
-        // Show loading screen while checking the auth status
-        return const Center(child: CircularProgressIndicator());
+        return const Center(
+          child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(Colors.pinkAccent),
+          ),
+        );
       },
     );
   }
