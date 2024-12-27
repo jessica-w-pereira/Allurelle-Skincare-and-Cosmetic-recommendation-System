@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'camera_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -12,43 +10,18 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  String userName = 'User'; // Default name
 
   @override
   void initState() {
     super.initState();
-    _fetchUserName();
   }
 
   Future<void> _fetchUserName() async {
-    final User? user = _auth.currentUser;
-    if (user != null) {
-      DocumentSnapshot doc = await _firestore.collection('users').doc(user.uid).get();
-      if (doc.exists && doc.data() != null) {
         setState(() {
-          userName = doc['name']; // Assuming 'name' is the field storing the user's name
         });
       }
     }
   }
-
-  void _openCamera(BuildContext context) async {
-    final String? imagePath = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const CameraPage(),
-      ),
-    );
-
-    if (imagePath != null) {
-      debugPrint('Image captured at: $imagePath');
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Image captured successfully!'),
-          backgroundColor: Colors.pinkAccent,
-        ),
-      );
     }
   }
 
@@ -58,12 +31,7 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications_outlined, color: Colors.grey),
-            onPressed: () {},
           ),
-        ],
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
@@ -75,17 +43,13 @@ class _HomePageState extends State<HomePage> {
                 text: TextSpan(
                   children: [
                     const TextSpan(
-                      text: "Welcome back,\n",
                       style: TextStyle(
                         fontSize: 22,
-                        fontWeight: FontWeight.w400,
                         color: Colors.black87,
                       ),
                     ),
                     TextSpan(
-                      text: userName, // Displays user's name
                       style: const TextStyle(
-                        fontSize: 28,
                         fontWeight: FontWeight.bold,
                         color: Colors.pinkAccent,
                       ),
@@ -95,41 +59,25 @@ class _HomePageState extends State<HomePage> {
               ),
               const Text(
                 "It's great to see you again!",
-                style: TextStyle(fontSize: 16, color: Colors.grey),
               ),
               const SizedBox(height: 30),
 
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Expanded(
                     child: ElevatedButton.icon(
                       onPressed: () {
-                        // Navigate to SkinQuiz
                       },
-                      icon: const Icon(Icons.chat_bubble_outline),
-                      label: const Text("Take SkinQuiz"),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.pinkAccent,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20.0),
                         ),
-                        padding: const EdgeInsets.all(15),
                       ),
                     ),
                   ),
-                  const SizedBox(width: 10),
-                  Expanded(
                     child: ElevatedButton.icon(
-                      onPressed: () => _openCamera(context),
-                      icon: const Icon(Icons.camera_alt_outlined),
-                      label: const Text("Capture Face"),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.pinkAccent,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20.0),
                         ),
-                        padding: const EdgeInsets.all(15),
                       ),
                     ),
                   ),
@@ -167,9 +115,7 @@ class _HomePageState extends State<HomePage> {
                   borderRadius: BorderRadius.circular(15),
                 ),
                 padding: const EdgeInsets.all(16),
-                child: Row(
                   children: [
-                    const Expanded(
                       child: Text(
                         "Get 10% off your first dermatologist consultation!",
                         style: TextStyle(
@@ -188,11 +134,6 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
-        onTap: (index) {
-          if (index == 3) {
-            Navigator.pushNamed(context, '/profile'); // Navigate to Profile
-          }
-        },
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
@@ -221,9 +162,7 @@ class _HomePageState extends State<HomePage> {
   Widget productCard(String title, String imagePath) {
     return Container(
       width: 120,
-      margin: const EdgeInsets.only(right: 12),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(15),
         boxShadow: const [
           BoxShadow(
             color: Colors.black12,
@@ -237,28 +176,10 @@ class _HomePageState extends State<HomePage> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           ClipRRect(
-            borderRadius: BorderRadius.circular(15),
-            child: Image.asset(
-              imagePath,
-              height: 80,
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) {
-                return Container(
-                  height: 80,
-                  color: Colors.grey[200],
-                  child: const Icon(Icons.image_not_supported, color: Colors.grey),
-                );
-              },
-            ),
           ),
           const SizedBox(height: 8),
           Text(
             title,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: Colors.grey[700],
-            ),
           ),
         ],
       ),

@@ -17,9 +17,6 @@ class ProfilePage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Profile'),
-        centerTitle: true,
-        backgroundColor: Colors.pinkAccent,
       ),
       body: FutureBuilder<Map<String, dynamic>>(
         future: user != null ? _getUserData(user.uid) : null,
@@ -35,13 +32,9 @@ class ProfilePage extends StatelessWidget {
           final userData = snapshot.data!;
 
           return Padding(
-            padding: const EdgeInsets.all(16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  "User Profile",
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 20),
                 ListTile(

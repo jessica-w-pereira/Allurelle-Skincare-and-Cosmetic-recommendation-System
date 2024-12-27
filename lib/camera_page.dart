@@ -14,8 +14,6 @@ class _CameraPageState extends State<CameraPage> {
   bool _isCameraInitialized = false;
   bool _isCameraPermissionGranted = false;
   String _errorMessage = '';
-  List<CameraDescription>? _cameras;
-  int _selectedCameraIndex = 0; // Track the camera index (0: back, 1: front)
 
   @override
   void initState() {
@@ -45,8 +43,6 @@ class _CameraPageState extends State<CameraPage> {
 
   Future<void> _initializeCamera() async {
     try {
-      _cameras = await availableCameras();
-      if (_cameras == null || _cameras!.isEmpty) {
         setState(() {
           _errorMessage = 'No cameras found on device';
         });
@@ -54,7 +50,6 @@ class _CameraPageState extends State<CameraPage> {
       }
 
       _controller = CameraController(
-        _cameras![_selectedCameraIndex],
         ResolutionPreset.high,
         enableAudio: false,
       );
@@ -73,14 +68,6 @@ class _CameraPageState extends State<CameraPage> {
       });
       debugPrint('Camera initialization error: $e');
     }
-  }
-
-  void _toggleCamera() async {
-    setState(() {
-      _selectedCameraIndex = (_selectedCameraIndex + 1) % _cameras!.length; // Toggle between cameras
-      _isCameraInitialized = false; // Reset camera state
-    });
-    await _initializeCamera();
   }
 
   @override
@@ -185,12 +172,6 @@ class _CameraPageState extends State<CameraPage> {
                     onPressed: () => Navigator.pop(context),
                     backgroundColor: Colors.white,
                     child: const Icon(Icons.arrow_back, color: Colors.pinkAccent),
-                  ),
-                  FloatingActionButton(
-                    heroTag: 'toggleButton',
-                    onPressed: _toggleCamera, // Toggle between front and back cameras
-                    backgroundColor: Colors.white,
-                    child: const Icon(Icons.switch_camera, color: Colors.pinkAccent),
                   ),
                   FloatingActionButton(
                     heroTag: 'captureButton',

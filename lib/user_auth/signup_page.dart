@@ -43,17 +43,10 @@ class _SignUpPageState extends State<SignUpPage> {
 
     try {
       // Create user with Firebase Authentication
-      UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
         email: emailController.text,
         password: passwordController.text,
       );
 
-      User? user = userCredential.user; // Get the user object
-
-      // Update the user's display name
-      await user?.updateProfile(displayName: nameController.text);
-
-      String uid = user!.uid; // Get the unique Firebase uid
 
       // Store user details in Firestore using the uid as the document ID
       await _firestore.collection('users').doc(uid).set({
