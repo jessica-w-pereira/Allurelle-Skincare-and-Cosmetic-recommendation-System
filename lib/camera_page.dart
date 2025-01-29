@@ -43,6 +43,8 @@ class _CameraPageState extends State<CameraPage> {
 
   Future<void> _initializeCamera() async {
     try {
+      final cameras = await availableCameras();
+      if (cameras.isEmpty) {
         setState(() {
           _errorMessage = 'No cameras found on device';
         });
@@ -50,6 +52,7 @@ class _CameraPageState extends State<CameraPage> {
       }
 
       _controller = CameraController(
+        cameras[0],
         ResolutionPreset.high,
         enableAudio: false,
       );
@@ -155,6 +158,20 @@ class _CameraPageState extends State<CameraPage> {
     }
 
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        automaticallyImplyLeading: false,
+        elevation: 0,
+        title: Padding(
+          padding: const EdgeInsets.only(left: 15.0),
+          child: Image.asset(
+            'assets/allurelle_logo.png',
+            height: 50,
+            width: 50,
+          ),
+        ),
+        centerTitle: false,
+      ),
       body: Stack(
         children: [
           CameraPreview(_controller!),
