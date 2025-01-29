@@ -87,7 +87,7 @@ class _SkinquizPageState extends State<SkinquizPage> {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Quiz submitted successfully!')),
     );
-    Navigator.pushReplacementNamed(context, '/home');
+    Navigator.pushReplacementNamed(context, '/homepage');
   }
 
   @override
